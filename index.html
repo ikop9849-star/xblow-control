@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#070b14">
+<title>XBLOW CONTROL</title>
+
+<style>
+:root {
+  --bg:#070b14;
+  --panel:#101b2c;
+  --line:#1b4562;
+  --blue:#55dcff;
+  --text:#e8f7ff;
+  --muted:#91a9bd;
+  --green:#65f0b2;
+  --red:#ff7e8c;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  padding:16px;
+  color:var(--text);
+  background:
+    radial-gradient(ellipse at top,#15314e,transparent 65%),
+    var(--bg);
+  font-family:system-ui,sans-serif;
+}
+main { max-width:780px; margin:auto; }
+header {
+  display:flex; align-items:center; gap:12px;
+  margin:8px 0 24px;
+}
+.logo {
+  width:48px; height:48px;
+  display:grid; place-items:center;
+  border:1px solid var(--blue);
+  border-radius:13px; color:var(--blue);
+  font-size:26px; font-weight:900;
+  box-shadow:0 0 20px #55dcff22;
+}
+h1 { margin:0; font-size:22px; }
+h2 { margin:0 0 14px; font-size:16px; }
+.subtitle { color:var(--muted); font-size:11px; }
+.panel {
+  padding:17px; margin-bottom:15px;
+  border:1px solid var(--line);
+  border-radius:15px;
+  background:linear-gradient(145deg,#111f32,#0b1321);
+}
+.muted { color:var(--muted); font-size:13px; line-height:1.7; }
+.status { color:var(--blue); font-size:13px; overflow-wrap:anywhere; }
+.stats {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.stat {
+  padding:13px; border-radius:10px;
+  background:#07101c; border:1px solid #19354b;
+}
+.stat strong { display:block; margin-top:7px; font-size:14px; }
+button {
+  width:100%; padding:12px;
+  border:1px solid #286182;
+  border-radius:9px; background:#10283b;
+  color:var(--blue); font:inherit;
+  font-size:13px; font-weight:700;
+  cursor:pointer; margin:4px 0;
+}
+button.primary { background:var(--blue); color:#06101a; }
+button.danger { border-color:#733b4b; color:var(--red); }
+button:disabled { opacity:.45; cursor:not-allowed; }
+.grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+.module { min-height:95px; text-align:left; }
+.module span { display:block; font-size:23px; margin-bottom:6px; }
+.module small { color:var(--muted); display:block; font-weight:400; margin-top:5px; }
+#log {
+  background:#050a12; border-radius:9px;
+  padding:12px; min-height:100px;
+  max-height:220px; overflow:auto;
+  white-space:pre-wrap; overflow-wrap:anywhere;
+  font:12px/1.8 monospace; color:#8fe8ff;
+}
+[hidden] { display:none !important; }
+footer {
+  text-align:center; margin:22px 0;
+  color:var(--muted); font-size:11px; line-height:1.8;
+}
+@media(min-width:560px) {
+  .grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+}
+</style>
+</head>
+
+<body>
+<main>
+<header>
+  <div class="logo">X</div>
+  <div>
+    <h1>XBLOW CONTROL</h1>
+    <div class="subtitle">DEVICE MANAGEMENT • CONSENT DEMO</div>
+  </div>
+</header>
+
+<section class="panel">
+  <h2>STATUS SISTEM</h2>
+  <div class="stats">
+    <div class="stat">
+      <span class="muted">Panel</span>
+      <strong style="color:var(--green)">● AKTIF</strong>
+    </div>
+    <div class="stat">
+      <span class="muted">Perangkat target</span>
+      <strong id="deviceStatus">OFFLINE</strong>
+    </div>
+  </div>
+  <p class="muted" id="connectionInfo">
+    Mode: Demo browser · Belum ada koneksi antarperangkat
+  </p>
+</section>
+
+<section class="panel">
+  <h2>PEMASANGAN PERANGKAT</h2>
+  <p class="muted">
+    Tidak menggunakan kode pemasangan. Pemilik perangkat
+    dapat membuka halaman persetujuan melalui alamat situs ini.
+  </p>
+  <button class="primary" id="showConsent">
+    Buka Halaman Persetujuan
+  </button>
+  <p class="status" id="pairStatus" aria-live="polite">
+    Menunggu persetujuan pengguna.
+  </p>
+</section>
+
+<section class="panel" id="consentPanel" hidden>
+  <h2>PERSETUJUAN PERANGKAT</h2>
+  <p class="muted">
+    Anda sedang membuka XBLOW CONTROL. Versi ini hanya
+    demonstrasi antarmuka. Tidak ada akses ke kamera,
+    mikrofon, lokasi, layar, file, atau fungsi sistem.
+    Persetujuan ini tidak menghubungkan perangkat lain.
+  </p>
+  <button class="primary" id="acceptConsent">
+    Saya Setuju untuk Demo
+  </button>
+  <button class="danger" id="rejectConsent">
+    Tolak
+  </button>
+  <p class="status" id="consentStatus" aria-live="polite">
+    Belum ada pilihan.
+  </p>
+</section>
+
+<section class="panel">
+  <h2>MODUL PERANGKAT</h2>
+  <p class="muted">
+    Pilih modul untuk melihat permintaan demonstrasi.
+    Tidak ada perintah perangkat yang dikirim.
+  </p>
+  <div class="grid">
+    <button class="module" data-feature="Senter">
+      <span>🔦</span>SENTER
+      <small>Perlu aplikasi pendamping</small>
+    </button>
+    <button class="module" data-feature="Kamera">
+      <span>📷</span>KAMERA
+      <small>Perlu izin Android</small>
+    </button>
+    <button class="module" data-feature="Lokasi">
+      <span>📍</span>LOKASI
+      <small>Perlu izin lokasi</small>
+    </button>
+    <button class="module" data-feature="Berbagi layar">
+      <span>▣</span>BERBAGI LAYAR
+      <small>Perlu persetujuan sistem</small>
+    </button>
+    <button class="module" data-feature="Wallpaper">
+      <span>🖼️</span>WALLPAPER
+      <small>Perlu aplikasi pendamping</small>
+    </button>
+    <button class="module" data-feature="Kunci perangkat">
+      <span>🔒</span>KUNCI PERANGKAT
+      <small>Perlu otorisasi Android</small>
+    </button>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>PERMINTAAN AKSI</h2>
+  <p class="muted" id="requestText">
+    Belum ada modul yang dipilih.
+  </p>
+  <button class="primary" id="approveAction" disabled>
+    Setujui Demo
+  </button>
+  <button id="cancelAction" disabled>
+    Batalkan Permintaan
+  </button>
+</section>
+
+<section class="panel">
+  <h2>LOG AKTIVITAS</h2>
+  <div id="log" aria-live="polite">XBLOW CONTROL dimulai.
+Mode: DEMO LOKAL.
+Menunggu tindakan pengguna.</div>
+  <button id="clearLog">Bersihkan Log</button>
+</section>
+
+<footer>
+  XBLOW CONTROL • HTML DEMO<br>
+  Tidak mengirim data ke server dan tidak mengendalikan HP lain.
+</footer>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+let selectedFeature = null;
+let consentGiven = false;
+
+function log(message) {
+  const time = new Date().toLocaleTimeString();
+  $("log").textContent =
+    `[${time}] ${message}\n` + $("log").textContent;
+}
+
+function resetRequest() {
+  selectedFeature = null;
+  $("requestText").textContent = "Belum ada modul yang dipilih.";
+  $("approveAction").disabled = true;
+  $("cancelAction").disabled = true;
+}
+
+$("showConsent").addEventListener("click", () => {
+  $("consentPanel").hidden = false;
+  $("consentPanel").scrollIntoView({behavior:"smooth"});
+  log("Halaman persetujuan dibuka.");
+});
+
+$("acceptConsent").addEventListener("click", () => {
+  consentGiven = true;
+  $("consentStatus").textContent = "Persetujuan demo diterima.";
+  $("pairStatus").textContent =
+    "Demo disetujui pada browser ini. Perangkat belum terhubung.";
+  $("deviceStatus").textContent = "BELUM TERHUBUNG";
+  $("connectionInfo").textContent =
+    "Mode: Demo browser · Persetujuan lokal saja";
+  log("Pengguna menyetujui demonstrasi.");
+});
+
+$("rejectConsent").addEventListener("click", () => {
+  consentGiven = false;
+  $("consentStatus").textContent = "Persetujuan ditolak.";
+  $("pairStatus").textContent = "Belum ada perangkat terhubung.";
+  log("Pengguna menolak demonstrasi.");
+});
+
+document.querySelectorAll("[data-feature]").forEach(button => {
+  button.addEventListener("click", () => {
+    selectedFeature = button.dataset.feature;
+    $("requestText").textContent =
+      "Permintaan demo: " + selectedFeature;
+    $("approveAction").disabled = false;
+    $("cancelAction").disabled = false;
+    log("Modul dipilih: " + selectedFeature);
+  });
+});
+
+$("approveAction").addEventListener("click", () => {
+  if (!selectedFeature) return;
+  log("Demo disetujui untuk modul: " + selectedFeature);
+  $("requestText").textContent =
+    selectedFeature + ": demo selesai. Tidak ada aksi perangkat.";
+  $("approveAction").disabled = true;
+  $("cancelAction").disabled = true;
+  selectedFeature = null;
+});
+
+$("cancelAction").addEventListener("click", () => {
+  log("Permintaan demo dibatalkan.");
+  resetRequest();
+});
+
+$("clearLog").addEventListener("click", () => {
+  $("log").textContent = "Log dibersihkan.";
+});
+</script>
+</body>
+</html>
