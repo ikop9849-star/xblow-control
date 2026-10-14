@@ -1,100 +1,145 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>XBLOW RAT</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 24px;
-      background: #0b1020;
-      color: #f1f5f9;
-      font-family: Arial, sans-serif;
-    }
-    main {
-      max-width: 520px;
-      margin: 30px auto;
-    }
-    .card {
-      background: #151d30;
-      border: 1px solid #334155;
-      border-radius: 16px;
-      padding: 20px;
-      margin: 16px 0;
-    }
-    h1 { color: #8bafff; }
-    button, input {
-      box-sizing: border-box;
-      width: 100%;
-      padding: 13px;
-      margin-top: 10px;
-      border-radius: 9px;
-      border: 1px solid #475569;
-      font-size: 16px;
-    }
-    button {
-      background: #315de8;
-      color: white;
-      border: none;
-    }
-    input {
-      background: #0b1020;
-      color: white;
-    }
-    .muted { color: #a8b4ca; }
-    #result { overflow-wrap: anywhere; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#070b14">
+<title>XBLOW CONTROL</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg:#070b14;
+  --panel:#101d30;
+  --blue:#55dcff;
+  --text:#e8f7ff;
+  --muted:#9ab0c5;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0; padding:18px;
+  background:radial-gradient(ellipse at top,#10243c,transparent 65%),var(--bg);
+  color:var(--text); font:15px system-ui,sans-serif;
+}
+main { max-width:600px; margin:auto; }
+.panel {
+  padding:18px; margin:14px 0;
+  background:var(--panel);
+  border:1px solid #194765; border-radius:15px;
+}
+h1 { font-size:23px; }
+h2 { font-size:16px; }
+p { line-height:1.6; }
+.muted { color:var(--muted); font-size:13px; }
+.status { color:var(--blue); overflow-wrap:anywhere; }
+button {
+  width:100%; padding:13px; margin:5px 0;
+  border:1px solid #286182; border-radius:9px;
+  background:#10283b; color:var(--blue);
+  font-weight:700; cursor:pointer;
+}
+.primary { background:var(--blue); color:#06101a; }
+button:disabled { opacity:.5; }
+#log {
+  white-space:pre-wrap; overflow-wrap:anywhere;
+  background:#050a12; border-radius:8px;
+  padding:12px; font-size:12px;
+}
+</style>
 </head>
 <body>
-  <main>
-    <h1>XBLOW RAT</h1>
-    <p class="muted">Remote Admin Lite · Panel demo</p>
+<main>
+  <h1>⚡ XBLOW CONTROL</h1>
+  <p class="muted">DEVICE CONNECTION • CONSENT DEMO</p>
 
-    <section class="card">
-      <h3>Status koneksi</h3>
-      <p>Panel: <strong style="color:#6ee7b7">Aktif</strong></p>
-      <p>Perangkat: <strong id="status">Belum terhubung</strong></p>
-      <p class="muted">
-        Status ini belum berasal dari perangkat sungguhan.
+  <section class="panel">
+    <h2>STATUS SISTEM</h2>
+    <p class="status" id="status">● Panel aktif</p>
+    <p class="muted">
+      Mode: Wi-Fi lokal atau cloud<br>
+      Status perangkat: Belum terhubung
+    </p>
+  </section>
+
+  <section class="panel">
+    <h2>PERSETUJUAN PERANGKAT</h2>
+    <p class="muted">
+      Halaman ini menjelaskan permintaan koneksi.
+      Persetujuan tidak memberikan akses otomatis
+      ke fitur sistem Android.
+    </p>
+    <button class="primary" id="showConsent">
+      Tampilkan Persetujuan
+    </button>
+
+    <div id="consent" hidden>
+      <p>
+        Saya memahami bahwa ini adalah demonstrasi
+        koneksi XBLOW CONTROL. Belum ada akses jarak jauh
+        atau pengiriman data perangkat.
       </p>
-    </section>
+      <button class="primary" id="accept">
+        Setujui Demo
+      </button>
+      <button id="reject">Tolak</button>
+    </div>
 
-    <section class="card">
-      <h3>Pairing perangkat</h3>
-      <p class="muted">
-        Masukkan kode dari aplikasi perangkat yang kamu miliki.
-        Demo ini belum memverifikasi kode melalui server.
-      </p>
-      <input id="pairCode" placeholder="Masukkan kode pairing">
-      <button onclick="pair()">Coba pairing demo</button>
-      <p id="result"></p>
-    </section>
+    <p class="status" id="consentStatus" aria-live="polite">
+      Menunggu pilihan pengguna.
+    </p>
+  </section>
 
-    <section class="card">
-      <h3>Fitur yang direncanakan</h3>
-      <p>• Status online/offline</p>
-      <p>• Transfer file dengan persetujuan</p>
-      <p>• Pengaturan wallpaper dengan izin</p>
-      <p>• Kontrol flash dengan izin</p>
-    </section>
-  </main>
+  <section class="panel">
+    <h2>STATUS KONEKSI</h2>
+    <p class="muted">
+      Status ini hanya berlaku pada halaman browser
+      yang sedang dibuka. Belum tersinkron antar-HP.
+    </p>
+    <button id="disconnect">Putuskan Demo</button>
+  </section>
 
-  <script>
-    function pair() {
-      const code = document.getElementById("pairCode").value.trim();
-      const result = document.getElementById("result");
+  <section class="panel">
+    <h2>LOG AKTIVITAS</h2>
+    <div id="log" aria-live="polite">Panel dimulai.
+Menunggu tindakan pengguna.</div>
+  </section>
+</main>
 
-      if (!code) {
-        result.textContent = "Masukkan kode pairing terlebih dahulu.";
-        return;
-      }
+<script>
+const $ = id => document.getElementById(id);
 
-      result.textContent =
-        "Demo saja: kode diterima di halaman, tetapi belum diverifikasi.";
-    }
-  </script>
+function log(message) {
+  const time = new Date().toLocaleTimeString();
+  $("log").textContent =
+    `[${time}] ${message}\n` + $("log").textContent;
+}
+
+$("showConsent").onclick = () => {
+  $("consent").hidden = false;
+  log("Halaman persetujuan ditampilkan.");
+};
+
+$("accept").onclick = () => {
+  $("consentStatus").textContent =
+    "Demo disetujui pada browser ini.";
+  $("status").textContent =
+    "● DEMO DISETUJUI — BELUM TERHUBUNG";
+  log("Persetujuan demo diterima secara lokal.");
+};
+
+$("reject").onclick = () => {
+  $("consentStatus").textContent =
+    "Pengguna menolak koneksi demo.";
+  $("status").textContent = "● PANEL AKTIF";
+  log("Permintaan demo ditolak.");
+};
+
+$("disconnect").onclick = () => {
+  $("consentStatus").textContent =
+    "Demo diakhiri.";
+  $("status").textContent = "● PANEL AKTIF";
+  $("consent").hidden = true;
+  log("Demo diakhiri oleh pengguna.");
+};
+</script>
 </body>
 </html>
-
